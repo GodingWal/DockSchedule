@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - AMB Driver Log{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-primary">
+      <i class="bi bi-speedometer2 me-2"></i>Warehouse Operations Dashboard
+    </h2>
+    <p class="text-muted mb-0">Real-time overview of today's driver appointments</p>
+  </div>
+</div>
+
+<!-- Stats Cards Row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-calendar-check text-primary fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Today's Appointments</h6>
+        <h3 class="fw-bold mb-0">{{ total|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-box-arrow-in-right text-warning fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Checked In</h6>
+        <h3 class="fw-bold mb-0">{{ checked_in|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-check-circle text-success fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Completed</h6>
+        <h3 class="fw-bold mb-0">{{ completed|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-exclamation-triangle text-danger fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Late</h6>
+        <h3 class="fw-bold mb-0">{{ late|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-x-circle text-secondary fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Missed</h6>
+        <h3 class="fw-bold mb-0">{{ missed|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-lg-2">
+    <div class="card h-100 border-0 shadow-sm">
+      <div class="card-body text-center">
+        <i class="bi bi-x-octagon text-dark fs-1 mb-2"></i>
+        <h6 class="card-title text-muted mb-1">Cancelled</h6>
+        <h3 class="fw-bold mb-0">{{ cancelled|default:"0" }}</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- IB/OB Badges Row -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <span class="badge bg-primary fs-6 px-3 py-2">
+        <i class="bi bi-arrow-down-circle me-1"></i>{{ ib_count|default:"0" }} Inbound
+      </span>
+      <span class="badge bg-info fs-6 px-3 py-2">
+        <i class="bi bi-arrow-up-circle me-1"></i>{{ ob_count|default:"0" }} Outbound
+      </span>
+      <span class="text-muted ms-auto">
+        <i class="bi bi-calendar3 me-1"></i>{{ today|date:"F d, Y" }}
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Action Buttons -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <a href="{% url 'add_appointment' %}" class="btn btn-success w-100 py-3 shadow-sm">
+      <i class="bi bi-plus-circle fs-3 d-block mb-1"></i>
+      <span class="fw-semibold">Add Appointment</span>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'check_in' %}" class="btn btn-warning w-100 py-3 shadow-sm text-dark">
+      <i class="bi bi-box-arrow-in-right fs-3 d-block mb-1"></i>
+      <span class="fw-semibold">Check In Driver</span>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'check_out' %}" class="btn btn-info w-100 py-3 shadow-sm text-dark">
+      <i class="bi bi-box-arrow-left fs-3 d-block mb-1"></i>
+      <span class="fw-semibold">Check Out Driver</span>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{% url 'kpi_export' %}" class="btn btn-secondary w-100 py-3 shadow-sm">
+      <i class="bi bi-file-earmark-spreadsheet fs-3 d-block mb-1"></i>
+      <span class="fw-semibold">KPI Export</span>
+    </a>
+  </div>
+</div>
+
+<!-- Scheduled Appointments Table -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 fw-semibold text-primary">
+          <i class="bi bi-calendar-check me-2"></i>Scheduled Appointments Today
+        </h5>
+        <span class="badge bg-primary rounded-pill">{{ scheduled_list|length }}</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover table-striped mb-0 align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>Type</th>
+                <th>Time</th>
+                <th>Customer</th>
+                <th>Carrier</th>
+                <th>BOL</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for appt in scheduled_list %}
+              <tr>
+                <td>
+                  {% if appt.appt_type == 'IB' %}
+                    <span class="badge bg-primary">IB</span>
+                  {% else %}
+                    <span class="badge bg-info">OB</span>
+                  {% endif %}
+                </td>
+                <td>{{ appt.appt_time|time:"H:i" }}</td>
+                <td>{{ appt.customer.name }}</td>
+                <td>{{ appt.carrier.name }}</td>
+                <td><code>{{ appt.bol_shipment_no|default:"—" }}</code></td>
+                <td>
+                  <span class="badge bg-secondary">{{ appt.status }}</span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                  No scheduled appointments for today
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Checked-In Drivers Table -->
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 fw-semibold text-warning">
+          <i class="bi bi-box-arrow-in-right me-2"></i>Checked-In Drivers
+        </h5>
+        <span class="badge bg-warning text-dark rounded-pill">{{ checked_in_list|length }}</span>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover table-striped mb-0 align-middle">
+            <thead class="table-dark">
+              <tr>
+                <th>Type</th>
+                <th>Time</th>
+                <th>Customer</th>
+                <th>Driver Name</th>
+                <th>Door</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for appt in checked_in_list %}
+              <tr>
+                <td>
+                  {% if appt.appt_type == 'IB' %}
+                    <span class="badge bg-primary">IB</span>
+                  {% else %}
+                    <span class="badge bg-info">OB</span>
+                  {% endif %}
+                </td>
+                <td>{{ appt.appt_time|time:"H:i" }}</td>
+                <td>{{ appt.customer.name }}</td>
+                <td>{{ appt.visit.visitor_name|default:"—" }}</td>
+                <td>
+                  {% if appt.visit.assigned_door %}
+                    <span class="badge bg-dark">{{ appt.visit.assigned_door.door_name }}</span>
+                  {% else %}
+                    <span class="text-muted">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <span class="badge bg-warning text-dark">{{ appt.status }}</span>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                  <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                  No drivers currently checked in
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

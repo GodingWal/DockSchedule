@@ -27,6 +27,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# CSRF trusted origins - allows GitHub Codespaces and local access
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:8080',
+    'https://localhost:8000',
+    'http://localhost:8080',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'https://*.app.github.dev',
+    'http://*.app.github.dev',
+]
 
 # Application definition
 
